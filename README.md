@@ -19,3 +19,5 @@
 * `notebooks/` — Jupyter Notebooks для експериментів.
 * `src/` — модулі `data_load`, `data_quality_analysis`, `data_research`.
 * `reports/figures/` — згенеровані графіки та звіти.
+
+Статус даних: Перевірено на пропуски, дані чисті.
