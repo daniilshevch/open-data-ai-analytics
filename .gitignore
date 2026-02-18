@@ -9,6 +9,9 @@ __pycache__/
 .venv/
 .env
 
+#IDE
+.idea/
+
 # Data
 data/raw/
 data/*.csv
