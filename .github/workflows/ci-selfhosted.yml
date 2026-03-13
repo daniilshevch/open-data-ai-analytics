@@ -33,7 +33,10 @@ jobs:
       - name: Execute script
         if: github.event.inputs.module == 'all' || github.event.inputs.module == matrix.module
         shell: powershell
+        env:
+          PYTHONUTF8: 1
         run: |
+          $OutputEncoding = [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
           $start = Get-Date
           python src/${{ matrix.module }}.py
           $end = Get-Date
