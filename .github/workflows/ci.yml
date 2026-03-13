@@ -26,8 +26,6 @@ jobs:
       matrix:
         module: [data_load, data_quality_analysis, data_research]
 
-    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.module == 'all' || github.event.inputs.module == matrix.module }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -44,6 +42,7 @@ jobs:
           pip install pandas seaborn matplotlib
 
       - name: Run module
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.module == 'all' || github.event.inputs.module == matrix.module
         run: python src/${{ matrix.module }}.py
 
       - name: Upload Artifacts
