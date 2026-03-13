@@ -1,0 +1,42 @@
+name: CI (self-hosted)
+
+on:
+  workflow_dispatch:
+    inputs:
+      module:
+        description: "Select module"
+        required: true
+        default: "all"
+        type: choice
+        options:
+          - all
+          - data_load
+          - data_quality_analysis
+          - data_research
+
+jobs:
+  run-modules-local:
+    runs-on: [self-hosted, windows, ryzen]
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [data_load, data_quality_analysis, data_research]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Execute script
+        if: github.event.inputs.module == 'all' || github.event.inputs.module == matrix.module
+        shell: powershell
+        run: |
+          $start = Get-Date
+          python src/${{ matrix.module }}.py
+          $end = Get-Date
+          Write-Host "Duration: $(($end - $start).TotalSeconds) seconds"
+
+      - name: Upload
+        if: always() && (github.event.inputs.module == 'all' || github.event.inputs.module == matrix.module)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ryzen-result-${{ matrix.module }}
+          path: reports/
