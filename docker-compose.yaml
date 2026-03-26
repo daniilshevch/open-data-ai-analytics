@@ -1,0 +1,81 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: analytics_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - "db_data:/var/lib/mysql"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 5s
+      retries: 10
+
+  data_load:
+    build:
+      context: .
+      dockerfile: src/data_load/Dockerfile
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: analytics_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      db:
+        condition: service_healthy
+
+  data_quality:
+    build:
+      context: .
+      dockerfile: src/data_quality_analysis/Dockerfile
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: analytics_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    depends_on:
+      data_load:
+        condition: service_completed_successfully
+
+  data_research:
+    build:
+      context: .
+      dockerfile: src/data_research/Dockerfile
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: analytics_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    depends_on:
+      data_load:
+        condition: service_completed_successfully
+
+  visualization:
+    build:
+      context: .
+      dockerfile: src/visualization/Dockerfile
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: analytics_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - ./reports:/app/reports
+    depends_on:
+      data_research:
+        condition: service_completed_successfully
+
+volumes:
+  db_data:
+  reports:
+
+networks:
+  default:
+    name: analytics_network
