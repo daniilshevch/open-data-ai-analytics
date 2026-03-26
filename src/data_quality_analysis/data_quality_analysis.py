@@ -1,25 +1,35 @@
 import pandas as pd
 import os
+from sqlalchemy import create_engine
+
 
 def check_data_quality():
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(current_dir, "..", "data", "nabir-16-2020-2021-roki_03-12-2018.csv")
+    db_user = os.getenv("MYSQL_USER", "user")
+    db_password = os.getenv("MYSQL_PASSWORD", "password")
+    db_host = os.getenv("MYSQL_HOST", "db")
+    db_name = os.getenv("MYSQL_DATABASE", "analytics_db")
 
-    if not os.path.exists(file_path):
-        print("❌ Файл не знайдено для аналізу якості!")
-        return
+    engine = create_engine(f"mysql+mysqlconnector://{db_user}:{db_password}@{db_host}/{db_name}")
 
-    df = pd.read_csv(file_path, sep=';', encoding='cp1251')
+    print("=== ЗВІТ ПРО ЯКІСТЬ ДАНИХ (БАЗА ДАНИХ) ===")
 
-    print("=== ЗВІТ ПРО ЯКІСТЬ ДАНИХ ===")
+    try:
+        query = "SELECT * FROM raw_data"
+        df = pd.read_sql(query, con=engine)
 
-    print("\n1. Кількість порожніх значень (NaN):")
-    print(df.isnull().sum())
+        print("✅ Дані успішно отримано з MySQL для аналізу.")
 
-    print("\n2. Типи даних по стовпцях:")
-    print(df.dtypes)
+        print("\n1. Кількість порожніх значень (NaN):")
+        print(df.isnull().sum())
 
-    print(f"\n3. Виявлено повних дублікатів рядків: {df.duplicated().sum()}")
+        print("\n2. Типи даних по стовпцях (визначені БД):")
+        print(df.dtypes)
+
+        print(f"\n3. Виявлено повних дублікатів рядків: {df.duplicated().sum()}")
+
+    except Exception as e:
+        print(f"❌ Помилка при читанні з БД: {e}")
+        print("Підказка: переконайтеся, що контейнер data_load вже відпрацював.")
 
 
 if __name__ == "__main__":
