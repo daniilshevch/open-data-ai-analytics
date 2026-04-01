@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+jinja2
+pandas
+sqlalchemy
+mysql-connector-python

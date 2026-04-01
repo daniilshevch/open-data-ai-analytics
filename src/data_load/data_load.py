@@ -10,7 +10,8 @@ def load_data_to_mysql():
     db_name = os.getenv("MYSQL_DATABASE", "analytics_db")
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(current_dir, "..", "..", "data", "nabir-16-2020-2021-roki_03-12-2018.csv")
+    base_dir = os.path.dirname(os.path.dirname(current_dir)) if "src" in current_dir else current_dir
+    file_path = os.path.join(base_dir, "data", "nabir-16-2020-2021-roki_03-12-2018.csv")
 
     if not os.path.exists(file_path):
         print("❌ Файл CSV не знайдено!")

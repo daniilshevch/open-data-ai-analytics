@@ -38,7 +38,7 @@ def run_research():
         if not inflation.empty:
             inf_row = inflation.iloc[0].copy()
             inf_row['research_category'] = 'inflation'
-            inf_row['calculated_diff'] = 0 # Для інфляції різницю не рахували
+            inf_row['calculated_diff'] = 0
             processed_data.append(inf_row)
 
         wage = df[df['Показник'].str.contains('заробітна плата', case=False, na=False)]
