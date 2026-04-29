@@ -1,0 +1,16 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+packages:
+  - git
+  - curl
+  - docker.io
+  - docker-compose-v2
+
+runcmd:
+  - systemctl enable --now docker
+  - mkdir -p /app
+  - cd /app
+  - git clone https://github.com/daniilshevch/open-data-ai-analytics.git .
+  - docker compose up -d
