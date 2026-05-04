@@ -6,12 +6,15 @@ metadata:
   namespace: analytics-app
   annotations:
     argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
   template:
     spec:
       containers:
       - name: loader
         image: daniilshevch/app-data_load:latest
+        imagePullPolicy: Always  # Додано
         env:
         - name: MYSQL_HOST
           value: "mysql-service"
@@ -31,12 +34,15 @@ metadata:
   namespace: analytics-app
   annotations:
     argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
   template:
     spec:
       containers:
       - name: quality
         image: daniilshevch/app-data_quality:latest
+        imagePullPolicy: Always  # Додано
         env:
         - name: MYSQL_HOST
           value: "mysql-service"
@@ -56,12 +62,15 @@ metadata:
   namespace: analytics-app
   annotations:
     argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
   template:
     spec:
       containers:
       - name: research
         image: daniilshevch/app-data_research:latest
+        imagePullPolicy: Always  # Додано
         env:
         - name: MYSQL_HOST
           value: "mysql-service"
@@ -81,12 +90,15 @@ metadata:
   namespace: analytics-app
   annotations:
     argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
   template:
     spec:
       containers:
       - name: visual
         image: daniilshevch/app-visualization:latest
+        imagePullPolicy: Always  # Додано
         env:
         - name: MYSQL_HOST
           value: "mysql-service"
