@@ -23,7 +23,7 @@ spec:
           value: "password"
       restartPolicy: OnFailure
 ---
-# WAVE 2: Якість та Дослідження (паралельно)
+# WAVE 2: Якість даних
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -37,17 +37,18 @@ spec:
       containers:
       - name: quality
         image: daniilshevch/app-data_quality:latest
-        env: &db_env
-          - name: MYSQL_HOST
-            value: "mysql-service"
-          - name: MYSQL_DATABASE
-            value: "analytics_db"
-          - name: MYSQL_USER
-            value: "user"
-          - name: MYSQL_PASSWORD
-            value: "password"
+        env:
+        - name: MYSQL_HOST
+          value: "mysql-service"
+        - name: MYSQL_DATABASE
+          value: "analytics_db"
+        - name: MYSQL_USER
+          value: "user"
+        - name: MYSQL_PASSWORD
+          value: "password"
       restartPolicy: OnFailure
 ---
+# WAVE 2: Дослідження (паралельно з якістю)
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -61,7 +62,15 @@ spec:
       containers:
       - name: research
         image: daniilshevch/app-data_research:latest
-        env: *db_env
+        env:
+        - name: MYSQL_HOST
+          value: "mysql-service"
+        - name: MYSQL_DATABASE
+          value: "analytics_db"
+        - name: MYSQL_USER
+          value: "user"
+        - name: MYSQL_PASSWORD
+          value: "password"
       restartPolicy: OnFailure
 ---
 # WAVE 3: Візуалізація
@@ -78,11 +87,20 @@ spec:
       containers:
       - name: visual
         image: daniilshevch/app-visualization:latest
-        env: *db_env
+        env:
+        - name: MYSQL_HOST
+          value: "mysql-service"
+        - name: MYSQL_DATABASE
+          value: "analytics_db"
+        - name: MYSQL_USER
+          value: "user"
+        - name: MYSQL_PASSWORD
+          value: "password"
         volumeMounts:
         - name: reports
           mountPath: /app/reports
       volumes:
       - name: reports
-        persistentVolumeClaim: { claimName: reports-pvc }
+        persistentVolumeClaim:
+          claimName: reports-pvc
       restartPolicy: OnFailure
