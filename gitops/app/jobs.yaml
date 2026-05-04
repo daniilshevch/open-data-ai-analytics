@@ -1,0 +1,88 @@
+# WAVE 1: Завантаження даних
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: data-load
+  namespace: analytics-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  template:
+    spec:
+      containers:
+      - name: loader
+        image: daniilshevch/app-data_load:latest
+        env:
+        - name: MYSQL_HOST
+          value: "mysql-service"
+        - name: MYSQL_DATABASE
+          value: "analytics_db"
+        - name: MYSQL_USER
+          value: "user"
+        - name: MYSQL_PASSWORD
+          value: "password"
+      restartPolicy: OnFailure
+---
+# WAVE 2: Якість та Дослідження (паралельно)
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: data-quality
+  namespace: analytics-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  template:
+    spec:
+      containers:
+      - name: quality
+        image: daniilshevch/app-data_quality:latest
+        env: &db_env
+          - name: MYSQL_HOST
+            value: "mysql-service"
+          - name: MYSQL_DATABASE
+            value: "analytics_db"
+          - name: MYSQL_USER
+            value: "user"
+          - name: MYSQL_PASSWORD
+            value: "password"
+      restartPolicy: OnFailure
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: data-research
+  namespace: analytics-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  template:
+    spec:
+      containers:
+      - name: research
+        image: daniilshevch/app-data_research:latest
+        env: *db_env
+      restartPolicy: OnFailure
+---
+# WAVE 3: Візуалізація
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: visualization
+  namespace: analytics-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  template:
+    spec:
+      containers:
+      - name: visual
+        image: daniilshevch/app-visualization:latest
+        env: *db_env
+        volumeMounts:
+        - name: reports
+          mountPath: /app/reports
+      volumes:
+      - name: reports
+        persistentVolumeClaim: { claimName: reports-pvc }
+      restartPolicy: OnFailure

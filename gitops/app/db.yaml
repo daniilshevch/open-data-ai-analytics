@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: analytics-app
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  selector:
+    matchLabels: { app: mysql }
+  template:
+    metadata:
+      labels: { app: mysql }
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "root_password"
+        - name: MYSQL_DATABASE
+          value: "analytics_db"
+        - name: MYSQL_USER
+          value: "user"
+        - name: MYSQL_PASSWORD
+          value: "password"
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: db-data
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: db-data
+        persistentVolumeClaim: { claimName: mysql-pvc }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: analytics-app
+spec:
+  selector: { app: mysql }
+  ports:
+  - port: 3306
+    targetPort: 3306
