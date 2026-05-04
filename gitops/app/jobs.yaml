@@ -12,7 +12,6 @@ spec:
       containers:
       - name: loader
         image: daniilshevch/app-data_load:latest
-        imagePullPolicy: Always
         env:
         - name: MYSQL_HOST
           value: "mysql-service"
@@ -38,7 +37,6 @@ spec:
       containers:
       - name: quality
         image: daniilshevch/app-data_quality:latest
-        imagePullPolicy: Always
         env:
         - name: MYSQL_HOST
           value: "mysql-service"
@@ -64,7 +62,6 @@ spec:
       containers:
       - name: research
         image: daniilshevch/app-data_research:latest
-        imagePullPolicy: Always
         env:
         - name: MYSQL_HOST
           value: "mysql-service"
@@ -90,7 +87,6 @@ spec:
       containers:
       - name: visual
         image: daniilshevch/app-visualization:latest
-        imagePullPolicy: Always
         env:
         - name: MYSQL_HOST
           value: "mysql-service"
