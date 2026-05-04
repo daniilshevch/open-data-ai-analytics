@@ -16,6 +16,7 @@ spec:
       containers:
       - name: web
         image: daniilshevch/app-web:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000
         env:
