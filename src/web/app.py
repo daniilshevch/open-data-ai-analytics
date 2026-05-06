@@ -5,6 +5,7 @@ from fastapi.templating import Jinja2Templates
 import pandas as pd
 import os
 from sqlalchemy import create_engine
+import socket
 
 app = FastAPI()
 
@@ -37,6 +38,7 @@ async def read_root(request: Request):
         context={
             "raw_data": raw_data,
             "research": research_results,   
-            "plots": plots
+            "plots": plots,
+            "hostname": socket.gethostname()
         }
     )
