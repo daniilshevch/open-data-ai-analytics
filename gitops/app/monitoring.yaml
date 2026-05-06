@@ -67,9 +67,17 @@ spec:
       labels:
         app: cadvisor
     spec:
+      automountServiceAccountToken: false 
       containers:
       - name: cadvisor
-        image: gcr.io/cadvisor/cadvisor:latest
+        image: gcr.io/cadvisor/cadvisor:v0.47.0 
+        securityContext:
+          privileged: true
+        args:
+          - --containerd=/run/k3s/containerd/containerd.sock
+        ports:
+        - containerPort: 8080
+          name: metrics
         volumeMounts:
         - name: rootfs
           mountPath: /rootfs
@@ -82,6 +90,9 @@ spec:
           readOnly: true
         - name: docker
           mountPath: /var/lib/docker
+          readOnly: true
+        - name: containerd-sock
+          mountPath: /run/k3s/containerd/containerd.sock
           readOnly: true
       volumes:
       - name: rootfs
@@ -96,6 +107,9 @@ spec:
       - name: docker
         hostPath:
           path: /var/lib/docker
+      - name: containerd-sock
+        hostPath:
+          path: /run/k3s/containerd/containerd.sock
 
 ---
 apiVersion: v1
