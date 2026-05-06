@@ -77,8 +77,6 @@ spec:
         args:
           - --containerd=/run/k3s/containerd/containerd.sock
           - --housekeeping_interval=10s
-          - --authentication=false
-          - --authorization=false
         ports:
         - containerPort: 8080
           name: metrics
