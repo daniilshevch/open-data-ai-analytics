@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: web
-        image: daniilshevch/app-web:latest
+        image: daniilshevch/app-web:v2
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
